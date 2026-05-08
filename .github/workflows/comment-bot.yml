@@ -2,7 +2,7 @@ name: Automated Comment Bot
 
 on:
   issues:
-    types: [opened]
+    types: [opened, labeled]
 
 jobs:
   comment:
@@ -10,36 +10,42 @@ jobs:
     permissions:
       issues: write
     steps:
-      - name: Comment on bug issues
-        if: contains(github.event.issue.labels.*.name, "bug")
+      - name: Add automated comment based on issue label
         uses: actions/github-script@v7
         with:
           script: |
-            github.rest.issues.createComment({
+            const labels = (context.payload.issue.labels || []).map(label => label.name);
+            const ownerName = 'Karthik Abinav Sankararaman';
+            let body = '';
+
+            if (labels.includes('bug')) {
+              body = `Thank you. We will fix it. Best regards, ${ownerName}.`;
+            } else if (labels.includes('feature')) {
+              body = `Thank you, we will consider to include this feature. Best regards, ${ownerName}.`;
+            } else if (labels.includes('discussion')) {
+              body = `Happy to discuss this topic with you. Best regards, ${ownerName}.`;
+            }
+
+            if (!body) {
+              return;
+            }
+
+            const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: "Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman."
-            })
-      - name: Comment on feature issues
-        if: contains(github.event.issue.labels.*.name, "feature")
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.createComment({
+              per_page: 100
+            });
+
+            const alreadyCommented = comments.some(comment => comment.body === body);
+
+            if (alreadyCommented) {
+              return;
+            }
+
+            await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: "Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman."
-            })
-      - name: Comment on discussion issues
-        if: contains(github.event.issue.labels.*.name, "discussion")
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: "Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman."
-            })
+              body
+            });
