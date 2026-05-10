@@ -1,44 +1,54 @@
-name: Auto Comment Bot
+name: Automated Comment Bot
 on:
   issues:
-    types: [opened]
+    types: [opened, labeled]
+
+permissions:
+  issues: write
 
 jobs:
-  auto-comment:
+  bug-comment:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
+    if: |
+      (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'bug')) ||
+      (github.event.action == 'labeled' && github.event.label.name == 'bug')
     steps:
-      - name: Bug comment
-        if: contains(github.event.issue.labels.*.name, 'bug')
-        uses: actions/github-script@v7
+      - uses: actions/github-script@v6
         with:
           script: |
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: "Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman."
+              body: 'Thank you. We will fix it. Best regards, karthikabinav.'
             })
-      - name: Feature comment
-        if: contains(github.event.issue.labels.*.name, 'feature')
-        uses: actions/github-script@v7
+  feature-comment:
+    runs-on: ubuntu-latest
+    if: |
+      (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'feature')) ||
+      (github.event.action == 'labeled' && github.event.label.name == 'feature')
+    steps:
+      - uses: actions/github-script@v6
         with:
           script: |
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: "Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman."
+              body: 'Thank you, we will consider to include this feature. Best regards, karthikabinav.'
             })
-      - name: Discussion comment
-        if: contains(github.event.issue.labels.*.name, 'discussion')
-        uses: actions/github-script@v7
+  discussion-comment:
+    runs-on: ubuntu-latest
+    if: |
+      (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'discussion')) ||
+      (github.event.action == 'labeled' && github.event.label.name == 'discussion')
+    steps:
+      - uses: actions/github-script@v6
         with:
           script: |
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: "Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman."
+              body: 'Happy to discuss this topic with you. Best regards, karthikabinav.'
             })
