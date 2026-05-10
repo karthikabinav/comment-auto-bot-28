@@ -20,7 +20,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'Thank you. We will fix it. Best regards, karthikabinav.'
+              body: 'Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman.'
             })
   feature-comment:
     runs-on: ubuntu-latest
@@ -35,7 +35,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'Thank you, we will consider to include this feature. Best regards, karthikabinav.'
+              body: 'Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman.'
             })
   discussion-comment:
     runs-on: ubuntu-latest
@@ -50,5 +50,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'Happy to discuss this topic with you. Best regards, karthikabinav.'
+              body: 'Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman.'
             })
