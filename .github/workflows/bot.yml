@@ -4,9 +4,6 @@ on:
   issues:
     types: [opened]
 
-permissions:
-  issues: write
-
 jobs:
   comment:
     runs-on: ubuntu-latest
@@ -20,7 +17,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: "Thank you. We will fix it. Best regards, karthikabinav."
+              body: "Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman."
             })
       - name: Comment on Feature
         if: contains(github.event.issue.labels.*.name, 'feature')
@@ -31,7 +28,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: "Thank you, we will consider to include this feature. Best regards, karthikabinav."
+              body: "Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman."
             })
       - name: Comment on Discussion
         if: contains(github.event.issue.labels.*.name, 'discussion')
@@ -42,5 +39,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: "Happy to discuss this topic with you. Best regards, karthikabinav."
+              body: "Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman."
             })
