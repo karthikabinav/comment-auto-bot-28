@@ -1,0 +1,54 @@
+name: Issue Comment Bot
+
+on:
+  issues:
+    types: [opened, labeled]
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment on bug issues
+        if: contains(github.event.issue.labels.*.name, 'bug')
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const ownerInfo = await github.rest.users.getByUsername({ username: owner });
+            const ownerName = ownerInfo.data.name || owner;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `Thank you. We will fix it. Best regards, ${ownerName}.`
+            });
+
+      - name: Comment on feature issues
+        if: contains(github.event.issue.labels.*.name, 'feature')
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const ownerInfo = await github.rest.users.getByUsername({ username: owner });
+            const ownerName = ownerInfo.data.name || owner;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `Thank you, we will consider to include this feature. Best regards, ${ownerName}.`
+            });
+
+      - name: Comment on discussion issues
+        if: contains(github.event.issue.labels.*.name, 'discussion')
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const ownerInfo = await github.rest.users.getByUsername({ username: owner });
+            const ownerName = ownerInfo.data.name || owner;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `Happy to discuss this topic with you. Best regards, ${ownerName}.`
+            });
