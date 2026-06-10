@@ -1,43 +1,10 @@
-name: Issue Comment Bot
+name: Disabled Legacy Issue Comment Bot
+
 on:
-  issues:
-    types: [opened, labeled]
+  workflow_dispatch:
+
 jobs:
-  comment:
+  disabled:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
     steps:
-      - name: Bug Comment
-        if: github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'bug') || github.event.action == 'labeled' && github.event.label.name == 'bug'
-        uses: actions/github-script@v6
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: "Thank you. We will fix it. Best regards, karthikabinav."
-            })
-      - name: Feature Comment
-        if: github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'feature') || github.event.action == 'labeled' && github.event.label.name == 'feature'
-        uses: actions/github-script@v6
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: "Thank you, we will consider to include this feature. Best regards, karthikabinav."
-            })
-      - name: Discussion Comment
-        if: github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'discussion') || github.event.action == 'labeled' && github.event.label.name == 'discussion'
-        uses: actions/github-script@v6
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: "Happy to discuss this topic with you. Best regards, karthikabinav."
-            })
+      - run: echo "Legacy workflow disabled. Use .github/workflows/issue-comment-bot.yml."
