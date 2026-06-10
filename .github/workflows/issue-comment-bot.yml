@@ -4,32 +4,35 @@ on:
   issues:
     types: [opened]
 
+permissions:
+  issues: write
+
 jobs:
   comment:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
     steps:
-      - name: Comment based on label
+      - name: Add label-based issue comment
         uses: actions/github-script@v7
         with:
           script: |
             const issue = context.payload.issue;
-            const labels = issue.labels.map(l => l.name);
-            const owner = context.repo.owner;
-            let comment = null;
-            if (labels.includes("bug")) {
-              comment = `Thank you. We will fix it. Best regards, ${owner}.`;
-            } else if (labels.includes("feature")) {
-              comment = `Thank you, we will consider to include this feature. Best regards, ${owner}.`;
-            } else if (labels.includes("discussion")) {
-              comment = `Happy to discuss this topic with you. Best regards, ${owner}.`;
+            const labels = issue.labels.map(label => label.name);
+            const ownerName = 'Karthik Abinav Sankararaman';
+            let body = null;
+
+            if (labels.includes('bug')) {
+              body = `Thank you. We will fix it. Best regards, ${ownerName}.`;
+            } else if (labels.includes('feature')) {
+              body = `Thank you, we will consider to include this feature. Best regards, ${ownerName}.`;
+            } else if (labels.includes('discussion')) {
+              body = `Happy to discuss this topic with you. Best regards, ${ownerName}.`;
             }
-            if (comment) {
+
+            if (body) {
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issue.number,
-                body: comment
+                body
               });
             }
