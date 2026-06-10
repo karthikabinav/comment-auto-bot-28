@@ -1,54 +1,43 @@
 name: Issue Comment Bot
-
 on:
   issues:
     types: [opened, labeled]
-
 jobs:
   comment:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
-      - name: Comment on bug issues
-        if: contains(github.event.issue.labels.*.name, 'bug')
+      - name: Bug Comment
+        if: github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'bug') || github.event.action == 'labeled' && github.event.label.name == 'bug'
         uses: actions/github-script@v6
         with:
           script: |
-            const owner = context.repo.owner;
-            const ownerInfo = await github.rest.users.getByUsername({ username: owner });
-            const ownerName = ownerInfo.data.name || owner;
-            await github.rest.issues.createComment({
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: `Thank you. We will fix it. Best regards, ${ownerName}.`
-            });
-
-      - name: Comment on feature issues
-        if: contains(github.event.issue.labels.*.name, 'feature')
+              body: "Thank you. We will fix it. Best regards, karthikabinav."
+            })
+      - name: Feature Comment
+        if: github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'feature') || github.event.action == 'labeled' && github.event.label.name == 'feature'
         uses: actions/github-script@v6
         with:
           script: |
-            const owner = context.repo.owner;
-            const ownerInfo = await github.rest.users.getByUsername({ username: owner });
-            const ownerName = ownerInfo.data.name || owner;
-            await github.rest.issues.createComment({
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: `Thank you, we will consider to include this feature. Best regards, ${ownerName}.`
-            });
-
-      - name: Comment on discussion issues
-        if: contains(github.event.issue.labels.*.name, 'discussion')
+              body: "Thank you, we will consider to include this feature. Best regards, karthikabinav."
+            })
+      - name: Discussion Comment
+        if: github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'discussion') || github.event.action == 'labeled' && github.event.label.name == 'discussion'
         uses: actions/github-script@v6
         with:
           script: |
-            const owner = context.repo.owner;
-            const ownerInfo = await github.rest.users.getByUsername({ username: owner });
-            const ownerName = ownerInfo.data.name || owner;
-            await github.rest.issues.createComment({
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: `Happy to discuss this topic with you. Best regards, ${ownerName}.`
-            });
+              body: "Happy to discuss this topic with you. Best regards, karthikabinav."
+            })
