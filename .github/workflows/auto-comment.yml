@@ -1,0 +1,29 @@
+name: Auto Comment
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Comment on Bug
+        if: contains(github.event.issue.labels.*.name, 'bug')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh issue comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body "Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman."
+
+      - name: Comment on Feature
+        if: contains(github.event.issue.labels.*.name, 'feature')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh issue comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body "Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman."
+
+      - name: Comment on Discussion
+        if: contains(github.event.issue.labels.*.name, 'discussion')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh issue comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body "Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman."
