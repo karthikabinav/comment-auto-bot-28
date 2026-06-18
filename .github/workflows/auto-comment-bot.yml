@@ -1,10 +1,29 @@
-name: Disabled Legacy Automated Comment Bot
-
+name: Issue Auto Comment Bot
 on:
-  workflow_dispatch:
-
+  issues:
+    types: [opened]
 jobs:
-  disabled:
+  comment:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Legacy workflow disabled. Use .github/workflows/issue-comment-bot.yml."
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            const labels = context.payload.issue.labels.map(l => l.name);
+            const owner = context.repo.owner;
+            let body = null;
+            if (labels.includes('bug')) {
+              body = `Thank you. We will fix it. Best regards, ${owner}.`;
+            } else if (labels.includes('feature')) {
+              body = `Thank you, we will consider to include this feature. Best regards, ${owner}.`;
+            } else if (labels.includes('discussion')) {
+              body = `Happy to discuss this topic with you. Best regards, ${owner}.`;
+            }
+            if (body) {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: body
+              });
+            }
