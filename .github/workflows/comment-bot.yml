@@ -1,4 +1,4 @@
-name: Automated Comment Bot
+name: Issue Comment Bot
 on:
   issues:
     types: [opened]
@@ -10,20 +10,20 @@ jobs:
         with:
           script: |
             const labels = context.payload.issue.labels.map(label => label.name);
-            let comment = "";
+            let body = "";
             const ownerName = "Karthik Abinav Sankararaman";
             if (labels.includes("bug")) {
-              comment = `Thank you. We will fix it. Best regards, ${ownerName}.`;
+              body = `Thank you. We will fix it. Best regards, ${ownerName}.`;
             } else if (labels.includes("feature")) {
-              comment = `Thank you, we will consider to include this feature. Best regards, ${ownerName}.`;
+              body = `Thank you, we will consider to include this feature. Best regards, ${ownerName}.`;
             } else if (labels.includes("discussion")) {
-              comment = `Happy to discuss this topic with you. Best regards, ${ownerName}.`;
+              body = `Happy to discuss this topic with you. Best regards, ${ownerName}.`;
             }
-            if (comment) {
-              await github.rest.issues.createComment({
+            if (body) {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: context.payload.issue.number,
-                body: comment
+                body: body
               });
             }
