@@ -1,32 +1,33 @@
 name: Automated Comment Bot
-
 on:
   issues:
-    types: [opened]
-
+    types: [opened, labeled]
 jobs:
   comment:
     runs-on: ubuntu-latest
     permissions:
       issues: write
     steps:
-      - name: Comment on bug issues
-        if: contains(github.event.issue.labels.*.name, 'bug')
-        uses: peter-evans/create-or-update-comment@v4
+      - name: Comment based on label
+        uses: actions/github-script@v7
         with:
-          issue-number: ${{ github.event.issue.number }}
-          body: "Thank you. We will fix it. Best regards, karthikabinav."
-
-      - name: Comment on feature issues
-        if: contains(github.event.issue.labels.*.name, 'feature')
-        uses: peter-evans/create-or-update-comment@v4
-        with:
-          issue-number: ${{ github.event.issue.number }}
-          body: "Thank you, we will consider to include this feature. Best regards, karthikabinav."
-
-      - name: Comment on discussion issues
-        if: contains(github.event.issue.labels.*.name, 'discussion')
-        uses: peter-evans/create-or-update-comment@v4
-        with:
-          issue-number: ${{ github.event.issue.number }}
-          body: "Happy to discuss this topic with you. Best regards, karthikabinav."
+          script: |
+            const issue = context.payload.issue;
+            const ownerName = "karthikabinav";
+            const labels = issue.labels.map(l => l.name);
+            let body = null;
+            if (labels.includes("bug")) {
+              body = `Thank you. We will fix it. Best regards, ${ownerName}.`;
+            } else if (labels.includes("feature")) {
+              body = `Thank you, we will consider to include this feature. Best regards, ${ownerName}.`;
+            } else if (labels.includes("discussion")) {
+              body = `Happy to discuss this topic with you. Best regards, ${ownerName}.`;
+            }
+            if (body) {
+              github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body
+              });
+            }
