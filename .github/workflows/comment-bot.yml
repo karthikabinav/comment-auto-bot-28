@@ -1,34 +1,28 @@
-name: Automated Comment Bot
-
+name: Comment Bot
 on:
   issues:
-    types: [opened, labeled]
-
+    types: [opened]
 jobs:
   comment:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
     steps:
       - uses: actions/github-script@v6
         with:
           script: |
-            const issue = context.payload.issue;
-            const labels = issue.labels.map(label => label.name);
-            const ownerName = "Karthik Abinav Sankararaman";
-            let commentBody = "";
-            if (labels.includes("bug")) {
-              commentBody = `Thank you. We will fix it. Best regards, ${ownerName}.`;
-            } else if (labels.includes("feature")) {
-              commentBody = `Thank you, we will consider to include this feature. Best regards, ${ownerName}.`;
-            } else if (labels.includes("discussion")) {
-              commentBody = `Happy to discuss this topic with you. Best regards, ${ownerName}.`;
+            const labels = context.payload.issue.labels.map(l => l.name);
+            let body;
+            if (labels.includes(bug)) {
+              body = `Thank you. We will fix it. Best regards, ${context.repo.owner}.`;
+            } else if (labels.includes(feature)) {
+              body = `Thank you, we will consider to include this feature. Best regards, ${context.repo.owner}.`;
+            } else if (labels.includes(discussion)) {
+              body = `Happy to discuss this topic with you. Best regards, ${context.repo.owner}.`;
             }
-            if (commentBody) {
+            if (body) {
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: issue.number,
-                body: commentBody
+                issue_number: context.issue.number,
+                body: body
               });
             }
