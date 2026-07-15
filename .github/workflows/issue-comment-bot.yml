@@ -22,7 +22,7 @@ jobs:
             const labels = issue.labels.map(label => label.name);
             
             let comment = null;
-            const ownerName = "Karthik Abinav Sankararaman";
+            const ownerName = "karthikabinav";
             
             if (labels.includes("bug")) {
               comment = `Thank you. We will fix it. Best regards, ${ownerName}.`;
@@ -30,6 +30,8 @@ jobs:
               comment = `Thank you, we will consider to include this feature. Best regards, ${ownerName}.`;
             } else if (labels.includes("discussion")) {
               comment = `Happy to discuss this topic with you. Best regards, ${ownerName}.`;
+            } else {
+              comment = `Hello, world!`;
             }
             
             if (comment) {
