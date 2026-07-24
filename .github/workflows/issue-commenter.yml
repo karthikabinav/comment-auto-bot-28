@@ -1,0 +1,37 @@
+name: Issue Commenter Bot
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment on issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+          ISSUE_LABELS: ${{ toJson(github.event.issue.labels) }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          LABELS=$(echo "$ISSUE_LABELS" | jq -r ".[].name")
+          COMMENT=""
+          for LABEL in $LABELS; do
+            if [ "$LABEL" = "bug" ]; then
+              COMMENT="Thank you. We will fix it. Best regards, $OWNER."
+              break
+            elif [ "$LABEL" = "feature" ]; then
+              COMMENT="Thank you, we will consider to include this feature. Best regards, $OWNER."
+              break
+            elif [ "$LABEL" = "discussion" ]; then
+              COMMENT="Happy to discuss this topic with you. Best regards, $OWNER."
+              break
+            fi
+          done
+          if [ -n "$COMMENT" ]; then
+            gh issue comment "$ISSUE_URL" --body "$COMMENT"
+          fi
