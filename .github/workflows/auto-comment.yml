@@ -4,30 +4,34 @@ on:
   issues:
     types: [opened]
 
+permissions:
+  issues: write
+
 jobs:
-  comment:
+  auto-comment:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
     steps:
-      - name: Comment based on label
+      - name: Comment on new issue based on label
         uses: actions/github-script@v7
         with:
           script: |
             const labels = context.payload.issue.labels.map(label => label.name);
-            let comment = null;
+            const owner = context.repo.owner;
+            let commentBody = null;
+
             if (labels.includes('bug')) {
-              comment = 'Thank you. We will fix it. Best regards, karthikabinav.';
+              commentBody = `Thank you. We will fix it. Best regards, ${owner}.`;
             } else if (labels.includes('feature')) {
-              comment = 'Thank you, we will consider to include this feature. Best regards, karthikabinav.';
+              commentBody = `Thank you, we will consider to include this feature. Best regards, ${owner}.`;
             } else if (labels.includes('discussion')) {
-              comment = 'Happy to discuss this topic with you. Best regards, karthikabinav.';
-            } else {
-              comment = 'Hello, world!';
+              commentBody = `Happy to discuss this topic with you. Best regards, ${owner}.`;
             }
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: comment
-            });
+
+            if (commentBody) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+            }
