@@ -2,7 +2,7 @@ name: Auto Comment Bot
 
 on:
   issues:
-    types: [opened, labeled]
+    types: [opened]
 
 jobs:
   auto-comment:
@@ -15,18 +15,19 @@ jobs:
         uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ github.event.issue.number }}
-          body: "Thank you. We will fix it. Best regards, karthikabinav."
-
+          body: |
+            Thank you. We will fix it. Best regards, karthikabinav.
       - name: Comment on feature issues
         if: contains(github.event.issue.labels.*.name, 'feature')
         uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ github.event.issue.number }}
-          body: "Thank you, we will consider to include this feature. Best regards, karthikabinav."
-
+          body: |
+            Thank you, we will consider to include this feature. Best regards, karthikabinav.
       - name: Comment on discussion issues
         if: contains(github.event.issue.labels.*.name, 'discussion')
         uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ github.event.issue.number }}
-          body: "Happy to discuss this topic with you. Best regards, karthikabinav."
+          body: |
+            Happy to discuss this topic with you. Best regards, karthikabinav.
