@@ -16,14 +16,13 @@ jobs:
           script: |
             const issue = context.payload.issue;
             const labels = issue.labels.map(l => l.name);
-            const owner = context.repo.owner;
             let message = null;
             if (labels.includes('bug')) {
-              message = `Thank you. We will fix it. Best regards, ${owner}.`;
+              message = `Thank you. We will fix it. Best regards, karthikabinav.`;
             } else if (labels.includes('feature')) {
-              message = `Thank you, we will consider to include this feature. Best regards, ${owner}.`;
+              message = `Thank you, we will consider to include this feature. Best regards, karthikabinav.`;
             } else if (labels.includes('discussion')) {
-              message = `Happy to discuss this topic with you. Best regards, ${owner}.`;
+              message = `Happy to discuss this topic with you. Best regards, karthikabinav.`;
             }
             if (message) {
               await github.rest.issues.createComment({
