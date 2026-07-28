@@ -1,16 +1,14 @@
-# Repository owner: karthikabinav (Karthik Abinav Sankararaman)
-name: Automated Comment Bot
+name: Auto Comment Bot
 
 on:
   issues:
     types: [opened]
 
-permissions:
-  issues: write
-
 jobs:
   auto-comment:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
       - name: Comment on bug issues
         if: contains(github.event.issue.labels.*.name, 'bug')
@@ -19,7 +17,6 @@ jobs:
           issue-number: ${{ github.event.issue.number }}
           body: |
             Thank you. We will fix it. Best regards, karthikabinav.
-
       - name: Comment on feature issues
         if: contains(github.event.issue.labels.*.name, 'feature')
         uses: peter-evans/create-or-update-comment@v4
@@ -27,7 +24,6 @@ jobs:
           issue-number: ${{ github.event.issue.number }}
           body: |
             Thank you, we will consider to include this feature. Best regards, karthikabinav.
-
       - name: Comment on discussion issues
         if: contains(github.event.issue.labels.*.name, 'discussion')
         uses: peter-evans/create-or-update-comment@v4
