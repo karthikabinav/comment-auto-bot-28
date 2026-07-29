@@ -1,14 +1,14 @@
 name: Auto Comment Bot
 on:
   issues:
-    types: [opened, labeled]
+    types: [opened]
 jobs:
   comment:
     runs-on: ubuntu-latest
     permissions:
       issues: write
     steps:
-      - name: Comment based on label
+      - name: Auto comment based on label
         uses: actions/github-script@v7
         with:
           script: |
@@ -22,6 +22,8 @@ jobs:
               body = "Thank you, we will consider to include this feature. Best regards, karthikabinav.";
             } else if (labels.includes("discussion")) {
               body = "Happy to discuss this topic with you. Best regards, karthikabinav.";
+            } else {
+              body = "Hello, world!";
             }
             if (body) {
               await github.rest.issues.createComment({
