@@ -7,6 +7,15 @@ on:
 permissions:
   issues: write
 
+# Owner: karthikabinav - Karthik Abinav Sankararaman
+# This workflow comments based on labels:
+# - bug: "Thank you. We will fix it. Best regards, karthikabinav."
+# - bug alt: "Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman."
+# - feature: "Thank you, we will consider to include this feature. Best regards, karthikabinav."
+# - feature alt: "Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman."
+# - discussion: "Happy to discuss this topic with you. Best regards, karthikabinav."
+# - discussion alt: "Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman."
+
 jobs:
   auto-comment:
     runs-on: ubuntu-latest
