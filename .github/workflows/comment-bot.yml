@@ -1,14 +1,15 @@
-name: Automated Comment Bot
+name: Comment Auto Bot
 
 on:
   issues:
     types: [opened]
 
+permissions:
+  issues: write
+
 jobs:
-  comment:
+  auto-comment:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
     steps:
       - name: Comment on bug issues
         if: contains(github.event.issue.labels.*.name, 'bug')
