@@ -1,5 +1,4 @@
 name: Automated Comment Bot
-
 on:
   issues:
     types: [opened]
@@ -19,7 +18,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: 'Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman.'
+              body: "Thank you. We will fix it. Best regards, karthikabinav."
             })
       - name: Comment on feature issues
         if: contains(github.event.issue.labels.*.name, 'feature')
@@ -30,7 +29,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: 'Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman.'
+              body: "Thank you, we will consider to include this feature. Best regards, karthikabinav."
             })
       - name: Comment on discussion issues
         if: contains(github.event.issue.labels.*.name, 'discussion')
@@ -41,5 +40,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: 'Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman.'
+              body: "Happy to discuss this topic with you. Best regards, karthikabinav."
             })
