@@ -1,34 +1,32 @@
 name: Auto Comment Bot
-
 on:
   issues:
-    types: [opened]
-
+    types: [opened, labeled]
 jobs:
-  auto-comment:
+  comment:
     runs-on: ubuntu-latest
     permissions:
       issues: write
     steps:
-      - name: Comment on new issue based on label
-        uses: actions/github-script@v6
+      - uses: actions/github-script@v7
         with:
           script: |
-            const labels = context.payload.issue.labels.map(label => label.name);
-            const owner = 'karthikabinav';
-            let comment = '';
+            const issue = context.payload.issue;
+            const owner = context.repo.owner;
+            const labels = issue.labels.map(l => l.name);
+            let body = null;
             if (labels.includes('bug')) {
-              comment = `Thank you. We will fix it. Best regards, ${owner}.`;
+              body = `Thank you. We will fix it. Best regards, ${owner}.`;
             } else if (labels.includes('feature')) {
-              comment = `Thank you, we will consider to include this feature. Best regards, ${owner}.`;
+              body = `Thank you, we will consider to include this feature. Best regards, ${owner}.`;
             } else if (labels.includes('discussion')) {
-              comment = `Happy to discuss this topic with you. Best regards, ${owner}.`;
-            } else {
-              comment = `Hello, world!`;
+              body = `Happy to discuss this topic with you. Best regards, ${owner}.`;
             }
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: comment
-            });
+            if (body) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: body
+              });
+            }
