@@ -1,7 +1,7 @@
 name: Auto Comment Bot
 on:
   issues:
-    types: [opened, labeled]
+    types: [opened]
 permissions:
   issues: write
 jobs:
