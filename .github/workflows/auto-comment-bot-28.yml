@@ -2,12 +2,11 @@ name: Automated Comment Bot
 on:
   issues:
     types: [opened]
-
+permissions:
+  issues: write
 jobs:
   comment:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
     steps:
       - name: Comment on bug issues
         if: contains(github.event.issue.labels.*.name, 'bug')
