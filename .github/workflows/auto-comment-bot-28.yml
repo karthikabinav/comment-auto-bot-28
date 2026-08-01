@@ -17,14 +17,12 @@ jobs:
         with:
           issue-number: ${{ github.event.issue.number }}
           body: "Thank you. We will fix it. Best regards, karthikabinav."
-
       - name: Comment on feature issues
         if: contains(github.event.issue.labels.*.name, 'feature')
         uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ github.event.issue.number }}
           body: "Thank you, we will consider to include this feature. Best regards, karthikabinav."
-
       - name: Comment on discussion issues
         if: contains(github.event.issue.labels.*.name, 'discussion')
         uses: peter-evans/create-or-update-comment@v4
