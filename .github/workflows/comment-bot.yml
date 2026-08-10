@@ -18,18 +18,18 @@ jobs:
             const issue = context.payload.issue;
             const labels = issue.labels.map(l => l.name);
             let body = "";
-            if (labels.includes('bug')) {
-              body = 'Thank you. We will fix it. Best regards, karthikabinav.';
-            } else if (labels.includes('feature')) {
-              body = 'Thank you, we will consider to include this feature. Best regards, karthikabinav.';
-            } else if (labels.includes('discussion')) {
-              body = 'Happy to discuss this topic with you. Best regards, karthikabinav.';
-            } else {
-              body = 'Hello, world!';
+            if (labels.includes(bug)) {
+              body = "Thank you. We will fix it. Best regards, karthikabinav.";
+            } else if (labels.includes(feature)) {
+              body = "Thank you, we will consider to include this feature. Best regards, karthikabinav.";
+            } else if (labels.includes(discussion)) {
+              body = "Happy to discuss this topic with you. Best regards, karthikabinav.";
             }
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issue.number,
-              body: body
-            });
+            if (body) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: body
+              });
+            }
