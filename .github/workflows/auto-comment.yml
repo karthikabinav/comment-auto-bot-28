@@ -25,6 +25,8 @@ jobs:
               comment = `Thank you, we will consider to include this feature. Best regards, ${ownerName}.`;
             } else if (labels.includes("discussion")) {
               comment = `Happy to discuss this topic with you. Best regards, ${ownerName}.`;
+            } else {
+              comment = "Hello, world!";
             }
 
             if (comment) {
