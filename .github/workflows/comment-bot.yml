@@ -11,25 +11,26 @@ jobs:
   comment:
     runs-on: ubuntu-latest
     steps:
-      - name: Detect label and comment
+      - name: Comment based on label
         uses: actions/github-script@v7
         with:
           script: |
             const issue = context.payload.issue;
             const labels = issue.labels.map(l => l.name);
-            let body = "";
+            const owner = context.repo.owner;
+            let comment = "Hello, world!";
+
             if (labels.includes("bug")) {
-              body = "Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman.";
+              comment = `Thank you. We will fix it. Best regards, ${owner}.`;
             } else if (labels.includes("feature")) {
-              body = "Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman.";
+              comment = `Thank you, we will consider to include this feature. Best regards, ${owner}.`;
             } else if (labels.includes("discussion")) {
-              body = "Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman.";
-            } else {
-              body = "Hello, world!";
+              comment = `Happy to discuss this topic with you. Best regards, ${owner}.`;
             }
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issue.number,
-              body: body
+              body: comment
             });
