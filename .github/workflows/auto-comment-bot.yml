@@ -4,28 +4,30 @@ on:
   issues:
     types: [opened]
 
-permissions:
-  issues: write
-
 jobs:
   comment:
     runs-on: ubuntu-latest
     steps:
-      - name: Comment on bug issues
-        if: contains(github.event.issue.labels.*.name, 'bug')
-        uses: peter-evans/create-or-update-comment@v4
+      - name: Comment based on label
+        uses: actions/github-script@v6
         with:
-          issue-number: ${{ github.event.issue.number }}
-          body: 'Thank you. We will fix it. Best regards, karthikabinav.'
-      - name: Comment on feature issues
-        if: contains(github.event.issue.labels.*.name, 'feature')
-        uses: peter-evans/create-or-update-comment@v4
-        with:
-          issue-number: ${{ github.event.issue.number }}
-          body: 'Thank you, we will consider to include this feature. Best regards, karthikabinav.'
-      - name: Comment on discussion issues
-        if: contains(github.event.issue.labels.*.name, 'discussion')
-        uses: peter-evans/create-or-update-comment@v4
-        with:
-          issue-number: ${{ github.event.issue.number }}
-          body: 'Happy to discuss this topic with you. Best regards, karthikabinav.'
+          script: |
+            const issue = context.payload.issue;
+            const labels = issue.labels.map(l => l.name);
+            const owner = context.repo.owner;
+            let comment = "Hello, world!";
+
+            if (labels.includes("bug")) {
+              comment = `Thank you. We will fix it. Best regards, ${owner}.`;
+            } else if (labels.includes("feature")) {
+              comment = `Thank you, we will consider to include this feature. Best regards, ${owner}.`;
+            } else if (labels.includes("discussion")) {
+              comment = `Happy to discuss this topic with you. Best regards, ${owner}.`;
+            }
+
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: comment
+            });
