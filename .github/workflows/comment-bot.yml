@@ -1,55 +1,30 @@
 name: Comment Auto Bot
-
 on:
   issues:
     types: [opened, labeled]
-
 jobs:
-  bug-comment:
-    if: contains(github.event.issue.labels.*.name, 'bug')
+  comment:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
     steps:
-      - name: Comment on bug issue
+      - name: Comment based on label
         uses: actions/github-script@v7
         with:
           script: |
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: 'Thank you. We will fix it. Best regards, ' + context.repo.owner + '.'
-            });
-  feature-comment:
-    if: contains(github.event.issue.labels.*.name, 'feature')
-    runs-on: ubuntu-latest
-    permissions:
-      issues: write
-    steps:
-      - name: Comment on feature issue
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: 'Thank you, we will consider to include this feature. Best regards, ' + context.repo.owner + '.'
-            });
-  discussion-comment:
-    if: contains(github.event.issue.labels.*.name, 'discussion')
-    runs-on: ubuntu-latest
-    permissions:
-      issues: write
-    steps:
-      - name: Comment on discussion issue
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: 'Happy to discuss this topic with you. Best regards, ' + context.repo.owner + '.'
-            });
+            const labels = context.payload.issue.labels.map(l => l.name);
+            const owner = context.repo.owner;
+            let body = "";
+            if (labels.includes("bug")) {
+              body = "Thank you. We will fix it. Best regards, " + owner + ".";
+            } else if (labels.includes("feature")) {
+              body = "Thank you, we will consider to include this feature. Best regards, " + owner + ".";
+            } else if (labels.includes("discussion")) {
+              body = "Happy to discuss this topic with you. Best regards, " + owner + ".";
+            }
+            if (body) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.issue.number,
+                body: body
+              });
+            }
