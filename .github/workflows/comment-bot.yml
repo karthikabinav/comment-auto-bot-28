@@ -16,7 +16,7 @@ jobs:
           script: |
             const issue = context.payload.issue;
             const labels = issue.labels.map(l => l.name);
-            const owner = "karthikabinav";
+            const owner = "Karthik Abinav Sankararaman";
             let comment = "";
             if (labels.includes("bug")) {
               comment = `Thank you. We will fix it. Best regards, ${owner}.`;
@@ -27,11 +27,9 @@ jobs:
             } else {
               comment = "Hello, world!";
             }
-            if (comment) {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                body: comment
-              });
-            }
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: comment
+            });
