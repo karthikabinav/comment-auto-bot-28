@@ -16,7 +16,7 @@ jobs:
           script: |
             const issue = context.payload.issue;
             const labels = issue.labels.map(l => l.name);
-            const owner = "Karthik Abinav Sankararaman";
+            const owner = "karthikabinav";
             let comment = "";
             if (labels.includes("bug")) {
               comment = `Thank you. We will fix it. Best regards, ${owner}.`;
