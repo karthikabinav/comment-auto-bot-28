@@ -28,3 +28,9 @@ jobs:
         with:
           issue-number: ${{ github.event.issue.number }}
           body: "Happy to discuss this topic with you. Best regards, karthikabinav."
+      - name: Comment hello world for unlabeled
+        if: ${{ join(github.event.issue.labels.*.name) == '' }}
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: "Hello, world!"
