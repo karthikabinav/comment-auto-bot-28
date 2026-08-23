@@ -1,7 +1,31 @@
-name: disabled
-on: push
+name: Automated Comment Bot
+on:
+  issues:
+    types: [opened]
+permissions:
+  issues: write
 jobs:
-  noop:
+  comment:
     runs-on: ubuntu-latest
     steps:
-      - run: echo disabled
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = context.payload.issue.labels.map(l => l.name);
+            const owner = "Karthik Abinav Sankararaman";
+            let body = "";
+            if (labels.includes("bug")) {
+              body = `Thank you. We will fix it. Best regards, ${owner}.`;
+            } else if (labels.includes("feature")) {
+              body = `Thank you, we will consider to include this feature. Best regards, ${owner}.`;
+            } else if (labels.includes("discussion")) {
+              body = `Happy to discuss this topic with you. Best regards, ${owner}.`;
+            } else {
+              body = "Hello, world!";
+            }
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              body: body
+            });
