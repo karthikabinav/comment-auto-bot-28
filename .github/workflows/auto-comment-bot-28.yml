@@ -1,9 +1,12 @@
 name: Auto Comment Bot
+
 on:
   issues:
     types: [opened]
+
 permissions:
   issues: write
+
 jobs:
   comment:
     runs-on: ubuntu-latest
@@ -12,7 +15,7 @@ jobs:
         with:
           script: |
             const labels = context.payload.issue.labels.map(l => l.name);
-            const owner = "Karthik Abinav Sankararaman";
+            const owner = "karthikabinav";
             let body = "";
             if (labels.includes("bug")) {
               body = `Thank you. We will fix it. Best regards, ${owner}.`;
