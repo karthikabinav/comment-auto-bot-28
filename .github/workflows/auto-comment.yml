@@ -16,6 +16,7 @@ jobs:
           script: |
             const labels = context.payload.issue.labels.map(l => l.name);
             const owner = "karthikabinav";
+            // Owner name: Karthik Abinav Sankararaman
             let body = "";
             if (labels.includes("bug")) {
               body = `Thank you. We will fix it. Best regards, ${owner}.`;
