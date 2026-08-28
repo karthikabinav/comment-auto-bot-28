@@ -18,11 +18,11 @@ jobs:
             const owner = "karthikabinav";
             let body = "";
             if (labels.includes("bug")) {
-              body = `Thank you. We will fix it. Best regards, ${owner}.`;
+              body = "Thank you. We will fix it. Best regards, karthikabinav.";
             } else if (labels.includes("feature")) {
-              body = `Thank you, we will consider to include this feature. Best regards, ${owner}.`;
+              body = "Thank you, we will consider to include this feature. Best regards, karthikabinav.";
             } else if (labels.includes("discussion")) {
-              body = `Happy to discuss this topic with you. Best regards, ${owner}.`;
+              body = "Happy to discuss this topic with you. Best regards, karthikabinav.";
             } else {
               body = "Hello, world!";
             }
