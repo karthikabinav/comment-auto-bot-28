@@ -1,4 +1,4 @@
-name: Auto Comment Bot
+name: Automated Comment Bot
 
 on:
   issues:
@@ -24,7 +24,7 @@ jobs:
             } else if (labels.includes("discussion")) {
               body = `Happy to discuss this topic with you. Best regards, ${owner}.`;
             } else {
-              body = `Hello, world!`;
+              body = "Hello, world!";
             }
             await github.rest.issues.createComment({
               owner: context.repo.owner,
