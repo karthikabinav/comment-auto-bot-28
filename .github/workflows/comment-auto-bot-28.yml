@@ -1,4 +1,4 @@
-name: Automated Comment Bot
+name: comment-auto-bot-28
 
 on:
   issues:
@@ -15,15 +15,14 @@ jobs:
         with:
           script: |
             const labels = context.payload.issue.labels.map(l => l.name);
-            const owner = "Karthik Abinav Sankararaman";
-            const ownerLogin = "karthikabinav";
+            const owner = "karthikabinav";
             let body = "";
             if (labels.includes("bug")) {
-              body = "Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman.";
+              body = "Thank you. We will fix it. Best regards, karthikabinav.";
             } else if (labels.includes("feature")) {
-              body = "Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman.";
+              body = "Thank you, we will consider to include this feature. Best regards, karthikabinav.";
             } else if (labels.includes("discussion")) {
-              body = "Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman.";
+              body = "Happy to discuss this topic with you. Best regards, karthikabinav.";
             } else {
               body = "Hello, world!";
             }
