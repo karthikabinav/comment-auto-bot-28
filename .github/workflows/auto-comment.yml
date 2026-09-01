@@ -20,7 +20,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `Thank you. We will fix it. Best regards, ${context.repo.owner}.`
+              body: 'Thank you. We will fix it. Best regards, karthikabinav.'
             })
       - name: Comment on feature issues
         if: contains(github.event.issue.labels.*.name, 'feature')
@@ -31,7 +31,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `Thank you, we will consider to include this feature. Best regards, ${context.repo.owner}.`
+              body: 'Thank you, we will consider to include this feature. Best regards, karthikabinav.'
             })
       - name: Comment on discussion issues
         if: contains(github.event.issue.labels.*.name, 'discussion')
@@ -42,5 +42,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `Happy to discuss this topic with you. Best regards, ${context.repo.owner}.`
+              body: 'Happy to discuss this topic with you. Best regards, karthikabinav.'
             })
