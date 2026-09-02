@@ -1,0 +1,42 @@
+name: Auto Comment on New Issues
+
+on:
+  issues:
+    types: [opened, labeled]
+
+permissions:
+  issues: write
+
+jobs:
+  auto-comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post a label-based comment
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // Repository owner name used to sign every automated comment.
+            const ownerName = 'anaicalledsolaris';
+
+            const messages = {
+              bug: `Thank you. We will fix it. Best regards, ${ownerName}.`,
+              feature: `Thank you, we will consider to include this feature. Best regards, ${ownerName}.`,
+              discussion: `Happy to discuss this topic with you. Best regards, ${ownerName}.`,
+            };
+
+            const issue = context.payload.issue;
+            const labels = (issue.labels || []).map((label) => label.name);
+            const matched = ['bug', 'feature', 'discussion'].find((name) => labels.includes(name));
+
+            if (!matched) {
+              core.info('Issue has no bug/feature/discussion label - nothing to comment.');
+              return;
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: messages[matched],
+            });
