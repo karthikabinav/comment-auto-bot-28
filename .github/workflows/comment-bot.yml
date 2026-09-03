@@ -1,44 +1,34 @@
-name: Automated Comment Bot
+name: Comment Auto Bot
+
 on:
   issues:
     types: [opened]
 
+permissions:
+  issues: write
+
 jobs:
   auto-comment:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
     steps:
-      - name: Comment on bug issues
-        if: contains(github.event.issue.labels.*.name, bug)
+      - name: Comment based on label
         uses: actions/github-script@v7
         with:
           script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: Thank you. We will fix it. Best regards, karthikabinav.
-            })
-      - name: Comment on feature issues
-        if: contains(github.event.issue.labels.*.name, feature)
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: Thank you, we will consider to include this feature. Best regards, karthikabinav.
-            })
-      - name: Comment on discussion issues
-        if: contains(github.event.issue.labels.*.name, discussion)
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: Happy to discuss this topic with you. Best regards, karthikabinav.
-            })
+            const labels = context.payload.issue.labels.map(l => l.name);
+            let body = null;
+            if (labels.includes('bug')) {
+              body = 'Thank you. We will fix it. Best regards, karthikabinav.';
+            } else if (labels.includes('feature')) {
+              body = 'Thank you, we will consider to include this feature. Best regards, karthikabinav.';
+            } else if (labels.includes('discussion')) {
+              body = 'Happy to discuss this topic with you. Best regards, karthikabinav.';
+            }
+            if (body) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }
