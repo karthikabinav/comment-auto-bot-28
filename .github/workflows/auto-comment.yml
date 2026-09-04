@@ -1,31 +1,34 @@
-name: Comment Auto Bot
+name: Auto Comment Bot
+
 on:
   issues:
     types: [opened]
+
 permissions:
   issues: write
+
 jobs:
   auto-comment:
     runs-on: ubuntu-latest
     steps:
-      - name: Comment for bug label
-        if: contains(github.event.issue.labels.*.name, 'bug')
-        uses: peter-evans/create-or-update-comment@v4
+      - name: Comment based on label
+        uses: actions/github-script@v7
         with:
-          issue-number: ${{ github.event.issue.number }}
-          body: |
-            Thank you. We will fix it. Best regards, karthikabinav.
-      - name: Comment for feature label
-        if: contains(github.event.issue.labels.*.name, 'feature')
-        uses: peter-evans/create-or-update-comment@v4
-        with:
-          issue-number: ${{ github.event.issue.number }}
-          body: |
-            Thank you, we will consider to include this feature. Best regards, karthikabinav.
-      - name: Comment for discussion label
-        if: contains(github.event.issue.labels.*.name, 'discussion')
-        uses: peter-evans/create-or-update-comment@v4
-        with:
-          issue-number: ${{ github.event.issue.number }}
-          body: |
-            Happy to discuss this topic with you. Best regards, karthikabinav.
+          script: |
+            const labels = context.payload.issue.labels.map(l => l.name);
+            let body = "";
+            if (labels.includes("bug")) {
+              body = "Thank you. We will fix it. Best regards, karthikabinav.";
+            } else if (labels.includes("feature")) {
+              body = "Thank you, we will consider to include this feature. Best regards, karthikabinav.";
+            } else if (labels.includes("discussion")) {
+              body = "Happy to discuss this topic with you. Best regards, karthikabinav.";
+            } else {
+              body = "Hello, world!";
+            }
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              body: body
+            });
