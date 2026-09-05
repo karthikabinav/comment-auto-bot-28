@@ -2,7 +2,7 @@ name: Comment Auto Bot 28
 
 on:
   issues:
-    types: [opened, labeled]
+    types: [opened]
 
 permissions:
   issues: write
@@ -24,7 +24,7 @@ jobs:
             } else if (labels.includes("discussion")) {
               body = "Happy to discuss this topic with you. Best regards, karthikabinav.";
             } else {
-              return;
+              body = "Hello, world!";
             }
             await github.rest.issues.createComment({
               owner: context.repo.owner,
