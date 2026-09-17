@@ -1,30 +1,34 @@
-name: Automated Comment Bot
+name: Auto Comment Bot
+
 on:
   issues:
-    types: [opened, labeled]
+    types: [opened]
+
+permissions:
+  issues: write
+
 jobs:
   comment:
     runs-on: ubuntu-latest
     steps:
-      - name: Comment on issue based on label
+      - name: Add comment based on label
         uses: actions/github-script@v7
         with:
           script: |
-            const issue = context.payload.issue;
-            const labels = issue.labels.map(l => l.name);
-            let comment = null;
+            const labels = context.payload.issue.labels.map(l => l.name);
+            let body = "";
             if (labels.includes("bug")) {
-              comment = "Thank you. We will fix it. Best regards, karthikabinav.";
+              body = "Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman.";
             } else if (labels.includes("feature")) {
-              comment = "Thank you, we will consider to include this feature. Best regards, karthikabinav.";
+              body = "Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman.";
             } else if (labels.includes("discussion")) {
-              comment = "Happy to discuss this topic with you. Best regards, karthikabinav.";
+              body = "Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman.";
+            } else {
+              return;
             }
-            if (comment) {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                body: comment
-              });
-            }
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              body
+            });
