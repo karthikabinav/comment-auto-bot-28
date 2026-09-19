@@ -1,4 +1,5 @@
 name: Automated Comment Bot
+# Repository owner: Karthik Abinav Sankararaman (karthikabinav)
 
 on:
   issues:
