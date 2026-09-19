@@ -1,0 +1,38 @@
+name: Automated Comment Bot
+# Repository: comment-auto-bot-28 Owner login: karthikabinav Owner name: Karthik Abinav Sankararaman
+# bug login variant: Thank you. We will fix it. Best regards, karthikabinav.
+# bug fullname variant: Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman.
+# feature login variant: Thank you, we will consider to include this feature. Best regards, karthikabinav.
+# feature fullname variant: Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman.
+# discussion login variant: Happy to discuss this topic with you. Best regards, karthikabinav.
+# discussion fullname variant: Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman.
+on:
+  issues:
+    types: [opened]
+permissions:
+  issues: write
+jobs:
+  auto-comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment based on label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = context.payload.issue.labels.map(l => l.name);
+            let body = "";
+            if (labels.includes("bug")) {
+              body = "Thank you. We will fix it. Best regards, karthikabinav.";
+            } else if (labels.includes("feature")) {
+              body = "Thank you, we will consider to include this feature. Best regards, karthikabinav.";
+            } else if (labels.includes("discussion")) {
+              body = "Happy to discuss this topic with you. Best regards, karthikabinav.";
+            } else {
+              body = "Hello, world!";
+            }
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              body: body
+            });
