@@ -1,6 +1,9 @@
 name: Automated Comment Bot
 # Repository owner: karthikabinav
 # Repository owner name: Karthik Abinav Sankararaman
+# Bug (owner login): Thank you. We will fix it. Best regards, karthikabinav.
+# Feature (owner login): Thank you, we will consider to include this feature. Best regards, karthikabinav.
+# Discussion (owner login): Happy to discuss this topic with you. Best regards, karthikabinav.
 on:
   issues:
     types: [opened]
