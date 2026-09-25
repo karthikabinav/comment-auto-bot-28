@@ -1,5 +1,11 @@
 name: Automated Comment Bot
 
+# Repository owner: karthikabinav
+# Repository owner name: Karthik Abinav Sankararaman
+# Bug message (login form): Thank you. We will fix it. Best regards, karthikabinav.
+# Feature message (login form): Thank you, we will consider to include this feature. Best regards, karthikabinav.
+# Discussion message (login form): Happy to discuss this topic with you. Best regards, karthikabinav.
+
 on:
   issues:
     types: [opened]
@@ -17,13 +23,13 @@ jobs:
             const labels = context.payload.issue.labels.map(l => l.name);
             let body = null;
             if (labels.includes("bug")) {
-              body = `Thank you. We will fix it. Best regards, karthikabinav.`;
+              body = "Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman.";
             } else if (labels.includes("feature")) {
-              body = `Thank you, we will consider to include this feature. Best regards, karthikabinav.`;
+              body = "Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman.";
             } else if (labels.includes("discussion")) {
-              body = `Happy to discuss this topic with you. Best regards, karthikabinav.`;
+              body = "Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman.";
             } else {
-              body = `Hello, world!`;
+              body = "Hello, world!";
             }
             await github.rest.issues.createComment({
               owner: context.repo.owner,
