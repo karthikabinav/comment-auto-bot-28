@@ -1,31 +1,32 @@
-name: Automated Comment Bot
-# Repository owner: karthikabinav (Karthik Abinav Sankararaman)
-# bug label: Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman.
-# feature label: Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman.
-# discussion label: Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman.
-# no label: Hello, world!
+name: Auto Comment Bot
+
 on:
   issues:
     types: [opened]
-permissions:
-  issues: write
+
 jobs:
   auto-comment:
     runs-on: ubuntu-latest
     steps:
-      - name: Add comment based on issue label
+      - name: Comment based on issue labels
         uses: actions/github-script@v7
         with:
           script: |
             const labels = context.payload.issue.labels.map(label => label.name);
+            const ownerName = context.repo.owner;
             let body = null;
-            if (labels.includes("bug")) {
-              body = "Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman.";
-            } else if (labels.includes("feature")) {
-              body = "Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman.";
-            } else if (labels.includes("discussion")) {
-              body = "Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman.";
-            } else {
-              body = "Hello, world!";
+            if (labels.includes(bug)) {
+              body = `Thank you. We will fix it. Best regards, ${ownerName}.`;
+            } else if (labels.includes(feature)) {
+              body = `Thank you, we will consider to include this feature. Best regards, ${ownerName}.`;
+            } else if (labels.includes(discussion)) {
+              body = `Happy to discuss this topic with you. Best regards, ${ownerName}.`;
             }
-            await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.payload.issue.number, body: body});
+            if (body) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }
