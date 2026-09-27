@@ -1,4 +1,4 @@
-name: Comment Bot 28
+name: Automated Comment Bot
 
 on:
   issues:
