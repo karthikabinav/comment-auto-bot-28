@@ -1,12 +1,14 @@
-name: Comment Auto Bot
+name: Auto Comment Bot
 
 on:
   issues:
     types: [opened]
 
 jobs:
-  auto-comment:
+  comment-on-issue:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
       - name: Comment on bug issues
         if: contains(github.event.issue.labels.*.name, 'bug')
@@ -14,10 +16,10 @@ jobs:
         with:
           script: |
             github.rest.issues.createComment({
-              issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'Thank you. We will fix it. Best regards, karthikabinav.'
+              issue_number: context.issue.number,
+              body: "Thank you. We will fix it. Best regards, karthikabinav."
             })
 
       - name: Comment on feature issues
@@ -26,10 +28,10 @@ jobs:
         with:
           script: |
             github.rest.issues.createComment({
-              issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'Thank you, we will consider to include this feature. Best regards, karthikabinav.'
+              issue_number: context.issue.number,
+              body: "Thank you, we will consider to include this feature. Best regards, karthikabinav."
             })
 
       - name: Comment on discussion issues
@@ -38,8 +40,8 @@ jobs:
         with:
           script: |
             github.rest.issues.createComment({
-              issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'Happy to discuss this topic with you. Best regards, karthikabinav.'
+              issue_number: context.issue.number,
+              body: "Happy to discuss this topic with you. Best regards, karthikabinav."
             })
