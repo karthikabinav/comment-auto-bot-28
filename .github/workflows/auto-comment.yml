@@ -1,12 +1,13 @@
 name: Automated Comment Bot
-
+# Repository owner: karthikabinav (Karthik Abinav Sankararaman)
+# Bug: Thank you. We will fix it. Best regards, karthikabinav.
+# Feature: Thank you, we will consider to include this feature. Best regards, karthikabinav.
+# Discussion: Happy to discuss this topic with you. Best regards, karthikabinav.
 on:
   issues:
     types: [opened]
-
 permissions:
   issues: write
-
 jobs:
   auto-comment:
     runs-on: ubuntu-latest
