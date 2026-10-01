@@ -1,0 +1,55 @@
+name: Automated Comment Bot
+# Repository owner: karthikabinav (Karthik Abinav Sankararaman)
+# Replies to newly opened issues based on their label:
+#   bug        -> "Thank you. We will fix it. Best regards, <repo owner name>."
+#   feature    -> "Thank you, we will consider to include this feature. Best regards, <repo owner name>."
+#   discussion -> "Happy to discuss this topic with you. Best regards, <repo owner name>."
+# Issues without one of these labels are left alone.
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  auto-comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment on new issue based on label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const labels = (issue.labels || []).map(l => (typeof l === 'string' ? l : l.name).toLowerCase());
+
+            // Resolve the actual name of the repository owner (fall back to the known owner).
+            let ownerName = 'Karthik Abinav Sankararaman';
+            try {
+              const { data: owner } = await github.rest.users.getByUsername({ username: context.repo.owner });
+              ownerName = owner.name || owner.login || ownerName;
+            } catch (e) {
+              core.warning(`Could not resolve owner name, using fallback: ${e.message}`);
+            }
+
+            let body = null;
+            if (labels.includes('bug')) {
+              body = `Thank you. We will fix it. Best regards, ${ownerName}.`;
+            } else if (labels.includes('feature')) {
+              body = `Thank you, we will consider to include this feature. Best regards, ${ownerName}.`;
+            } else if (labels.includes('discussion')) {
+              body = `Happy to discuss this topic with you. Best regards, ${ownerName}.`;
+            }
+
+            if (body) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body,
+              });
+              core.info(`Commented on issue #${issue.number}: ${body}`);
+            } else {
+              core.info(`Issue #${issue.number} has no bug/feature/discussion label; skipping.`);
+            }
