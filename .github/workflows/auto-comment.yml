@@ -1,12 +1,14 @@
 name: Automated Comment Bot
-
+# Owner login: karthikabinav
+# Owner name: Karthik Abinav Sankararaman
+# Bug (login): Thank you. We will fix it. Best regards, karthikabinav.
+# Feature (login): Thank you, we will consider to include this feature. Best regards, karthikabinav.
+# Discussion (login): Happy to discuss this topic with you. Best regards, karthikabinav.
 on:
   issues:
     types: [opened]
-
 permissions:
   issues: write
-
 jobs:
   auto-comment:
     runs-on: ubuntu-latest
