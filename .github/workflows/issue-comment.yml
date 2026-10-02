@@ -18,11 +18,11 @@ jobs:
             const owner = "Karthik Abinav Sankararaman";
             
             let body = "";
-            if (labels.includes(bug)) {
+            if (labels.includes("bug")) {
               body = `Thank you. We will fix it. Best regards, ${owner}.`;
-            } else if (labels.includes(feature)) {
+            } else if (labels.includes("feature")) {
               body = `Thank you, we will consider to include this feature. Best regards, ${owner}.`;
-            } else if (labels.includes(discussion)) {
+            } else if (labels.includes("discussion")) {
               body = `Happy to discuss this topic with you. Best regards, ${owner}.`;
             }
             
