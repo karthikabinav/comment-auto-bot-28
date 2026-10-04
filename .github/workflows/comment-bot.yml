@@ -1,34 +1,36 @@
 name: Automated Comment Bot
-
+# Repository owner: karthikabinav
+# Repository owner name: Karthik Abinav Sankararaman
+# bug - login variant: Thank you. We will fix it. Best regards, karthikabinav.
+# feature - login variant: Thank you, we will consider to include this feature. Best regards, karthikabinav.
+# discussion - login variant: Happy to discuss this topic with you. Best regards, karthikabinav.
+# bug - full name variant: Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman.
+# feature - full name variant: Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman.
+# discussion - full name variant: Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman.
 on:
   issues:
     types: [opened]
-
+permissions:
+  issues: write
 jobs:
-  comment-on-new-issue:
+  auto-comment:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
     steps:
-      - name: Comment based on issue label
+      - name: Comment on bug issue
+        if: contains(github.event.issue.labels.*.name, bug)
         uses: actions/github-script@v7
         with:
           script: |
-            const issue = context.payload.issue;
-            const labelNames = issue.labels.map((label) => label.name);
-            let message = null;
-            if (labelNames.includes("bug")) {
-              message = "Thank you. We will fix it. Best regards, karthikabinav.";
-            } else if (labelNames.includes("feature")) {
-              message = "Thank you, we will consider to include this feature. Best regards, karthikabinav.";
-            } else if (labelNames.includes("discussion")) {
-              message = "Happy to discuss this topic with you. Best regards, karthikabinav.";
-            }
-            if (message) {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                body: message
-              });
-            }
+            github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body: Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman.})
+      - name: Comment on feature issue
+        if: contains(github.event.issue.labels.*.name, feature)
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body: Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman.})
+      - name: Comment on discussion issue
+        if: contains(github.event.issue.labels.*.name, discussion)
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body: Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman.})
