@@ -1,38 +1,26 @@
 name: Automated Comment Bot
-# Repository owner: karthikabinav (Karthik Abinav Sankararaman)
-# Bug comment: Thank you. We will fix it. Best regards, karthikabinav.
-# Bug comment (full name): Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman.
-# Feature comment: Thank you, we will consider to include this feature. Best regards, karthikabinav.
-# Feature comment (full name): Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman.
-# Discussion comment: Happy to discuss this topic with you. Best regards, karthikabinav.
-# Discussion comment (full name): Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman.
+# Owner: karthikabinav (Karthik Abinav Sankararaman)
+# Bug: Thank you. We will fix it. Best regards, karthikabinav.
+# Bug fullname: Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman.
+# Feature: Thank you, we will consider to include this feature. Best regards, karthikabinav.
+# Feature fullname: Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman.
+# Discussion: Happy to discuss this topic with you. Best regards, karthikabinav.
+# Discussion fullname: Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman.
 on:
   issues:
     types: [opened]
 permissions:
   issues: write
 jobs:
-  auto-comment:
+  comment:
     runs-on: ubuntu-latest
     steps:
-      - name: Comment on issue based on label
-        uses: actions/github-script@v7
+      - uses: actions/github-script@v7
         with:
           script: |
-            const labels = context.payload.issue.labels.map(label => label.name);
+            const labels = context.payload.issue.labels.map(l => l.name);
             let body = "";
-            if (labels.includes("bug")) {
-              body = "Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman.";
-            } else if (labels.includes("feature")) {
-              body = "Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman.";
-            } else if (labels.includes("discussion")) {
-              body = "Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman.";
-            }
-            if (body) {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.payload.issue.number,
-                body: body
-              });
-            }
+            if (labels.includes("bug")) { body = "Thank you. We will fix it. Best regards, karthikabinav."; }
+            else if (labels.includes("feature")) { body = "Thank you, we will consider to include this feature. Best regards, karthikabinav."; }
+            else if (labels.includes("discussion")) { body = "Happy to discuss this topic with you. Best regards, karthikabinav."; }
+            if (body) { await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.payload.issue.number, body}); }
