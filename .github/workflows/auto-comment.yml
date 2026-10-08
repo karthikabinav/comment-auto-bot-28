@@ -20,9 +20,6 @@ jobs:
         with:
           script: |
             const labels = context.payload.issue.labels.map(label => label.name);
-            // Bug fullname: Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman.
-            // Feature fullname: Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman.
-            // Discussion fullname: Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman.
             let body = null;
             if (labels.includes("bug")) {
               body = "Thank you. We will fix it. Best regards, karthikabinav.";
