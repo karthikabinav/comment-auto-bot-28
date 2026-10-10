@@ -1,12 +1,10 @@
 name: Automated Comment Bot
-
+# Owner: Karthik Abinav Sankararaman (karthikabinav)
 on:
   issues:
     types: [opened]
-
 permissions:
   issues: write
-
 jobs:
   auto-comment:
     runs-on: ubuntu-latest
@@ -20,7 +18,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: 'Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman. Thank you. We will fix it. Best regards, karthikabinav.'
+              body: 'Thank you. We will fix it. Best regards, karthikabinav.'
             })
       - name: Comment on feature issues
         if: contains(github.event.issue.labels.*.name, 'feature')
@@ -31,7 +29,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: 'Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman. Thank you, we will consider to include this feature. Best regards, karthikabinav.'
+              body: 'Thank you, we will consider to include this feature. Best regards, karthikabinav.'
             })
       - name: Comment on discussion issues
         if: contains(github.event.issue.labels.*.name, 'discussion')
@@ -42,5 +40,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: 'Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman. Happy to discuss this topic with you. Best regards, karthikabinav.'
+              body: 'Happy to discuss this topic with you. Best regards, karthikabinav.'
             })
