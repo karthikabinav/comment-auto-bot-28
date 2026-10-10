@@ -1,8 +1,16 @@
 name: Automated Comment Bot
+# Owner: karthikabinav (Karthik Abinav Sankararaman)
+# Bug: Thank you. We will fix it. Best regards, karthikabinav.
+# Bug fullname: Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman.
+# Feature: Thank you, we will consider to include this feature. Best regards, karthikabinav.
+# Feature fullname: Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman.
+# Discussion: Happy to discuss this topic with you. Best regards, karthikabinav.
+# Discussion fullname: Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman.
+# No label: Hello, world!
 
 on:
   issues:
-    types: [opened, labeled]
+    types: [opened]
 
 permissions:
   issues: write
@@ -20,7 +28,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: "Thank you. We will fix it. Best regards, karthikabinav."
+              body: 'Thank you. We will fix it. Best regards, karthikabinav.'
             })
       - name: Comment on feature issues
         if: contains(github.event.issue.labels.*.name, 'feature')
@@ -31,7 +39,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: "Thank you, we will consider to include this feature. Best regards, karthikabinav."
+              body: 'Thank you, we will consider to include this feature. Best regards, karthikabinav.'
             })
       - name: Comment on discussion issues
         if: contains(github.event.issue.labels.*.name, 'discussion')
@@ -42,5 +50,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: "Happy to discuss this topic with you. Best regards, karthikabinav."
+              body: 'Happy to discuss this topic with you. Best regards, karthikabinav.'
             })
