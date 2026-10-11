@@ -1,12 +1,12 @@
 name: Automated Comment Bot
-# Repository owner: karthikabinav (Karthik Abinav Sankararaman)
-# Bug: Thank you. We will fix it. Best regards, karthikabinav.
-# Bug fullname: Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman.
-# Feature: Thank you, we will consider to include this feature. Best regards, karthikabinav.
-# Feature fullname: Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman.
-# Discussion: Happy to discuss this topic with you. Best regards, karthikabinav.
-# Discussion fullname: Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman.
-# No label: Hello, world!
+# Repository owner: Karthik Abinav Sankararaman (karthikabinav)
+# Bug comment: Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman.
+# Bug comment (login): Thank you. We will fix it. Best regards, karthikabinav.
+# Feature comment: Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman.
+# Feature comment (login): Thank you, we will consider to include this feature. Best regards, karthikabinav.
+# Discussion comment: Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman.
+# Discussion comment (login): Happy to discuss this topic with you. Best regards, karthikabinav.
+# No label comment: Hello, world!
 on:
   issues:
     types: [opened]
@@ -28,12 +28,12 @@ jobs:
               body = "Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman.";
             } else if (labels.includes("discussion")) {
               body = "Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman.";
-            } else {
-              body = "Hello, world!";
             }
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: body
-            });
+            if (body) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }
