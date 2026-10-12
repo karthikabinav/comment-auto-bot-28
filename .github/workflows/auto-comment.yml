@@ -6,7 +6,6 @@ name: Automated Comment Bot
 # Feature fullname: Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman.
 # Discussion: Happy to discuss this topic with you. Best regards, karthikabinav.
 # Discussion fullname: Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman.
-# No label: Hello, world!
 on:
   issues:
     types: [opened]
@@ -28,8 +27,6 @@ jobs:
               body = "Thank you, we will consider to include this feature. Best regards, karthikabinav.";
             } else if (labels.includes("discussion")) {
               body = "Happy to discuss this topic with you. Best regards, karthikabinav.";
-            } else if (labels.length === 0) {
-              body = "Hello, world!";
             }
             if (body) {
               await github.rest.issues.createComment({
