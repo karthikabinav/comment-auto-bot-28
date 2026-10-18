@@ -9,7 +9,7 @@ name: Automated Comment Bot
 # No label: Hello, world!
 on:
   issues:
-    types: [opened, labeled]
+    types: [opened]
 permissions:
   issues: write
 jobs:
