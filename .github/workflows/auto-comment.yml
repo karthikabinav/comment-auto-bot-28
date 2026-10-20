@@ -1,12 +1,4 @@
 name: Automated Comment Bot
-# Owner: karthikabinav (Karthik Abinav Sankararaman)
-# Bug: Thank you. We will fix it. Best regards, karthikabinav.
-# Bug fullname: Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman.
-# Feature: Thank you, we will consider to include this feature. Best regards, karthikabinav.
-# Feature fullname: Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman.
-# Discussion: Happy to discuss this topic with you. Best regards, karthikabinav.
-# Discussion fullname: Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman.
-# No label: Hello, world!
 on:
   issues:
     types: [opened]
@@ -48,15 +40,4 @@ jobs:
               repo: context.repo.repo,
               issue_number: context.issue.number,
               body: 'Happy to discuss this topic with you. Best regards, karthikabinav.'
-            })
-      - name: Comment on issues with no label
-        if: ${{ !contains(github.event.issue.labels.*.name, 'bug') && !contains(github.event.issue.labels.*.name, 'feature') && !contains(github.event.issue.labels.*.name, 'discussion') }}
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: 'Hello, world!'
             })
