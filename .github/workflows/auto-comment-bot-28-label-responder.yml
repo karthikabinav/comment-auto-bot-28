@@ -1,0 +1,43 @@
+name: Automated Comment Bot (Label Responder)
+
+# Watches for newly opened issues and replies based on the issue's label:
+#   bug        -> "Thank you. We will fix it. Best regards, karthikabinav."
+#   feature    -> "Thank you, we will consider to include this feature. Best regards, karthikabinav."
+#   discussion -> "Happy to discuss this topic with you. Best regards, karthikabinav."
+# Issues without any of these labels get no automated reply.
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  label-comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment on new issue based on its label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const replies = {
+              bug: 'Thank you. We will fix it. Best regards, karthikabinav.',
+              feature: 'Thank you, we will consider to include this feature. Best regards, karthikabinav.',
+              discussion: 'Happy to discuss this topic with you. Best regards, karthikabinav.'
+            };
+            const labels = (context.payload.issue.labels || []).map(label => label.name);
+            const matched = Object.keys(replies).filter(name => labels.includes(name));
+            if (matched.length === 0) {
+              core.info('No bug/feature/discussion label on this issue - no comment added.');
+              return;
+            }
+            for (const name of matched) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: replies[name]
+              });
+              core.info(`Added "${name}" reply to issue #${context.issue.number}.`);
+            }
