@@ -1,44 +1,52 @@
 name: Automated Comment Bot
-
+# Owner login: karthikabinav
+# Owner fullname: Karthik Abinav Sankararaman
+# Bug login: Thank you. We will fix it. Best regards, karthikabinav.
+# Bug fullname: Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman.
+# Feature login: Thank you, we will consider to include this feature. Best regards, karthikabinav.
+# Feature fullname: Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman.
+# Discussion login: Happy to discuss this topic with you. Best regards, karthikabinav.
+# Discussion fullname: Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman.
+# No label comment: Hello, world!
 on:
   issues:
     types: [opened]
-
 permissions:
   issues: write
-
-concurrency:
-  group: auto-comment-bot-${{ github.repository }}-${{ github.event.issue.number }}
-  cancel-in-progress: false
-
 jobs:
   auto-comment:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
     steps:
-      - name: Comment according to issue labels
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+      - name: Comment on bug issues
+        if: contains(github.event.issue.labels.*.name, 'bug')
+        uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const labels = new Set(context.payload.issue.labels.map(label => label.name));
-            const messages = [
-              ["bug", "Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman."],
-              ["feature", "Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman."],
-              ["discussion", "Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman."]
-            ];
-            const bodies = messages.filter(([label]) => labels.has(label)).map(([, message]) => message);
-            if (labels.size === 0) bodies.push("Hello, world!");
-            if (bodies.length === 0) return;
-            const parameters = {
+            github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.issue.number
-            };
-            const comments = await github.paginate(github.rest.issues.listComments, {
-              ...parameters, per_page: 100
-            });
-            for (const body of bodies) {
-              if (comments.some(comment => comment.body === body)) continue;
-              await github.rest.issues.createComment({...parameters, body});
-            }
+              issue_number: context.issue.number,
+              body: 'Thank you. We will fix it. Best regards, karthikabinav.'
+            })
+      - name: Comment on feature issues
+        if: contains(github.event.issue.labels.*.name, 'feature')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: 'Thank you, we will consider to include this feature. Best regards, karthikabinav.'
+            })
+      - name: Comment on discussion issues
+        if: contains(github.event.issue.labels.*.name, 'discussion')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: 'Happy to discuss this topic with you. Best regards, karthikabinav.'
+            })
