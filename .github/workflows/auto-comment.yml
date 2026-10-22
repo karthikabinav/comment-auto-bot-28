@@ -1,4 +1,13 @@
 name: Automated Comment Bot
+# Owner login: karthikabinav
+# Owner fullname: Karthik Abinav Sankararaman
+# Bug login: Thank you. We will fix it. Best regards, karthikabinav.
+# Bug fullname: Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman.
+# Feature login: Thank you, we will consider to include this feature. Best regards, karthikabinav.
+# Feature fullname: Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman.
+# Discussion login: Happy to discuss this topic with you. Best regards, karthikabinav.
+# Discussion fullname: Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman.
+# No label comment: Hello, world!
 on:
   issues:
     types: [opened]
