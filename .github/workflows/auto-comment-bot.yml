@@ -1,75 +1,63 @@
 name: Automated Comment Bot
-
-# A friendly robot that watches for newly opened issues and replies
-# according to the issue's label:
-#   bug        -> Thank you. We will fix it. Best regards, karthikabinav.
-#   feature    -> Thank you, we will consider to include this feature. Best regards, karthikabinav.
-#   discussion -> Happy to discuss this topic with you. Best regards, karthikabinav.
-# Issues without one of these labels do not get an automated reply.
-
+# Owner login: karthikabinav
+# Owner fullname: Karthik Abinav Sankararaman
+# Bug login: Thank you. We will fix it. Best regards, karthikabinav.
+# Bug fullname: Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman.
+# Feature login: Thank you, we will consider to include this feature. Best regards, karthikabinav.
+# Feature fullname: Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman.
+# Discussion login: Happy to discuss this topic with you. Best regards, karthikabinav.
+# Discussion fullname: Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman.
+# No label comment: Hello, world!
 on:
   issues:
     types: [opened]
-
 permissions:
   issues: write
-
 jobs:
   auto-comment:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
     steps:
-      - name: Reply to the new issue based on its labels
+      - name: Comment on bug issues
+        if: contains(github.event.issue.labels.*.name, 'bug')
         uses: actions/github-script@v7
         with:
           script: |
-            const ownerName = 'karthikabinav'; // repository owner
-            const replies = {
-              bug: `Thank you. We will fix it. Best regards, ${ownerName}.`,
-              feature: `Thank you, we will consider to include this feature. Best regards, ${ownerName}.`,
-              discussion: `Happy to discuss this topic with you. Best regards, ${ownerName}.`,
-            };
-
-            const { owner, repo } = context.repo;
-            const issue_number = context.payload.issue.number;
-            const labels = (context.payload.issue.labels || []).map((label) => label.name);
-            const bodies = Object.keys(replies)
-              .filter((label) => labels.includes(label))
-              .map((label) => replies[label]);
-
-            if (bodies.length === 0) {
-              core.info(`Issue #${issue_number} has no bug/feature/discussion label, so no automated reply.`);
-              return;
-            }
-
-            // Retry politely if GitHub asks us to slow down (rate limits) or has a hiccup (5xx).
-            const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-            async function withRetry(request, attempts = 8) {
-              for (let attempt = 1; ; attempt++) {
-                try {
-                  return await request();
-                } catch (error) {
-                  const rateLimited = error.status === 429 ||
-                    (error.status === 403 && /rate limit/i.test(error.message || ''));
-                  const retryable = rateLimited || (error.status >= 500 && error.status < 600);
-                  if (!retryable || attempt >= attempts) throw error;
-                  const retryAfter = Number(error.response?.headers?.['retry-after']);
-                  const delay = retryAfter > 0 ? retryAfter * 1000 : Math.min(60000, 5000 * 2 ** (attempt - 1));
-                  core.warning(`GitHub API returned ${error.status}; retrying in ${Math.round(delay / 1000)}s (attempt ${attempt}/${attempts}).`);
-                  await sleep(delay);
-                }
-              }
-            }
-
-            // Avoid posting the same reply twice (e.g. when a run is re-run).
-            const existing = await withRetry(() =>
-              github.paginate(github.rest.issues.listComments, { owner, repo, issue_number, per_page: 100 })
-            );
-            for (const body of bodies) {
-              if (existing.some((comment) => comment.body === body)) {
-                core.info(`Reply already present on #${issue_number}: ${body}`);
-                continue;
-              }
-              await withRetry(() => github.rest.issues.createComment({ owner, repo, issue_number, body }));
-              core.info(`Commented on #${issue_number}: ${body}`);
-            }
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: 'Thank you. We will fix it. Best regards, karthikabinav.'
+            })
+      - name: Comment on feature issues
+        if: contains(github.event.issue.labels.*.name, 'feature')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: 'Thank you, we will consider to include this feature. Best regards, karthikabinav.'
+            })
+      - name: Comment on discussion issues
+        if: contains(github.event.issue.labels.*.name, 'discussion')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: 'Happy to discuss this topic with you. Best regards, karthikabinav.'
+            })
+      - name: Comment on issues with no label
+        if: ${{ join(github.event.issue.labels.*.name, ',') == '' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: 'Hello, world!'
+            })
