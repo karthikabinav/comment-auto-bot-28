@@ -14,7 +14,7 @@ permissions:
   issues: write
 
 concurrency:
-  group: comment-auto-bot-28-${{ github.event.issue.number || github.event.inputs.issue_number }}
+  group: comment-auto-bot-28-auto-comment-yml-${{ github.event.issue.number || github.event.inputs.issue_number }}
   cancel-in-progress: false
 
 jobs:
