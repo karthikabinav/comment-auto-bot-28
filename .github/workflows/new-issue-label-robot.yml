@@ -5,9 +5,19 @@ name: New Issue Label Robot
 #   feature    -> "Thank you, we will consider to include this feature. Best regards, karthikabinav."
 #   discussion -> "Happy to discuss this topic with you. Best regards, karthikabinav."
 # Issues without one of these labels do not get an automatic reply.
+#
+# The robot can also be started manually ("Run workflow") for an existing issue,
+# e.g. when GitHub Actions dropped the original "opened" event because too many
+# workflow runs were queued at the same time.
 on:
   issues:
     types: [opened]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: Number of an existing issue to reply to
+        required: true
+        type: string
 
 permissions:
   issues: write
@@ -17,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - name: Reply to the new issue based on its label
+      - name: Reply to the issue based on its label
         uses: actions/github-script@v7
         with:
           script: |
@@ -48,10 +58,18 @@ jobs:
               }
             }
 
-            const issueNumber = context.payload.issue.number;
-            let labels = (context.payload.issue.labels || []).map(label => label.name.toLowerCase());
+            const payloadIssue = context.payload.issue;
+            const issueNumber = payloadIssue
+              ? payloadIssue.number
+              : Number((context.payload.inputs || {}).issue_number);
+            if (!Number.isSafeInteger(issueNumber) || issueNumber <= 0) {
+              core.setFailed("A valid issue number is required.");
+              return;
+            }
+
+            let labels = ((payloadIssue && payloadIssue.labels) || []).map(label => label.name.toLowerCase());
             if (labels.length === 0) {
-              // Double-check via the API in case the labels were not included in the event payload.
+              // Look the labels up via the API (manual runs, or labels missing from the event payload).
               const { data } = await withRetry(() => github.rest.issues.listLabelsOnIssue({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
