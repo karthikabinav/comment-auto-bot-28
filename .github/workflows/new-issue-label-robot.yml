@@ -1,0 +1,78 @@
+name: New Issue Label Robot
+
+# Watches for newly opened issues and replies based on the issue's label:
+#   bug        -> "Thank you. We will fix it. Best regards, karthikabinav."
+#   feature    -> "Thank you, we will consider to include this feature. Best regards, karthikabinav."
+#   discussion -> "Happy to discuss this topic with you. Best regards, karthikabinav."
+# Issues without one of these labels do not get an automatic reply.
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  label-reply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Reply to the new issue based on its label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Replies signed with the repository owner's name (karthikabinav).
+            const replies = {
+              bug: "Thank you. We will fix it. Best regards, karthikabinav.",
+              feature: "Thank you, we will consider to include this feature. Best regards, karthikabinav.",
+              discussion: "Happy to discuss this topic with you. Best regards, karthikabinav."
+            };
+
+            // Retry helper so a temporary API rate limit or server error does not drop a reply.
+            const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+            async function withRetry(request, attempts = 8) {
+              for (let attempt = 1; ; attempt++) {
+                try {
+                  return await request();
+                } catch (error) {
+                  const status = error.status || 0;
+                  const retriable = status === 429 || status >= 500 ||
+                    (status === 403 && /rate limit|secondary|abuse/i.test(error.message || ""));
+                  if (!retriable || attempt >= attempts) throw error;
+                  const headers = (error.response && error.response.headers) || {};
+                  const retryAfter = Number(headers["retry-after"]);
+                  const delaySeconds = retryAfter > 0 ? Math.min(retryAfter, 300) : Math.min(30 * attempt, 300);
+                  core.warning(`GitHub API returned ${status}; retrying in ${delaySeconds}s (attempt ${attempt} of ${attempts}).`);
+                  await sleep(delaySeconds * 1000);
+                }
+              }
+            }
+
+            const issueNumber = context.payload.issue.number;
+            let labels = (context.payload.issue.labels || []).map(label => label.name.toLowerCase());
+            if (labels.length === 0) {
+              // Double-check via the API in case the labels were not included in the event payload.
+              const { data } = await withRetry(() => github.rest.issues.listLabelsOnIssue({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber
+              }));
+              labels = data.map(label => label.name.toLowerCase());
+            }
+
+            let replied = false;
+            for (const [label, body] of Object.entries(replies)) {
+              if (!labels.includes(label)) continue;
+              await withRetry(() => github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body
+              }));
+              replied = true;
+              core.info(`Commented on issue #${issueNumber} for the "${label}" label.`);
+            }
+
+            if (!replied) {
+              core.info(`Issue #${issueNumber} has no bug, feature or discussion label, so no comment was added.`);
+            }
