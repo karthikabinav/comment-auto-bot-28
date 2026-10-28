@@ -3,6 +3,12 @@ name: Automated Comment Bot
 on:
   issues:
     types: [opened]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: Issue number to test with the comment bot
+        required: true
+        type: string
 
 permissions:
   issues: write
@@ -40,8 +46,20 @@ jobs:
               }
             }
 
-            const issueNumber = context.payload.issue.number;
-            let labels = (context.payload.issue.labels || []).map(label => label.name.toLowerCase());
+            const issueNumber = context.payload.issue?.number ?? Number(context.payload.inputs?.issue_number);
+            if (!Number.isSafeInteger(issueNumber) || issueNumber <= 0) {
+              throw new Error("A valid issue number is required.");
+            }
+            let issue = context.payload.issue;
+            if (!issue) {
+              const { data } = await withRetry(() => github.rest.issues.get({
+                ...context.repo,
+                issue_number: issueNumber
+              }));
+              issue = data;
+            }
+            if (issue.pull_request) return;
+            let labels = (issue.labels || []).map(label => label.name.toLowerCase());
             if (labels.length === 0) {
               const { data } = await withRetry(() => github.rest.issues.listLabelsOnIssue({
                 ...context.repo,
