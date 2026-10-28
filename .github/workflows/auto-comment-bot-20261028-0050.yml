@@ -1,6 +1,5 @@
 name: Automated Comment Bot
 
-# Watches for newly opened issues and replies based on the issue's label.
 on:
   issues:
     types: [opened]
@@ -13,21 +12,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Comment on the new issue based on its label
-        uses: actions/github-script@v7
+      - name: Reply to the new issue
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea9 # v7
         with:
           script: |
-            // Name of the repository owner used to sign every reply.
-            const repoOwnerName = "karthikabinav";
-
-            // Reply to post for each supported label.
+            const repoOwnerName = "Karthik Abinav Sankararaman";
             const replies = {
               bug: `Thank you. We will fix it. Best regards, ${repoOwnerName}.`,
               feature: `Thank you, we will consider to include this feature. Best regards, ${repoOwnerName}.`,
               discussion: `Happy to discuss this topic with you. Best regards, ${repoOwnerName}.`
             };
 
-            // Retry helper so a temporary GitHub API rate limit does not drop a reply.
             const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
             async function withRetry(request, attempts = 6) {
               for (let attempt = 1; ; attempt++) {
@@ -39,7 +34,7 @@ jobs:
                   if (!retriable || attempt >= attempts) throw error;
                   const retryAfter = Number(error.response?.headers?.["retry-after"]);
                   const delaySeconds = retryAfter > 0 ? retryAfter : 15 * attempt;
-                  core.warning(`GitHub API returned ${error.status}; retrying in ${delaySeconds}s (attempt ${attempt} of ${attempts}).`);
+                  core.warning(`GitHub API returned ${error.status}; retrying in ${delaySeconds}s.`);
                   await sleep(delaySeconds * 1000);
                 }
               }
@@ -48,7 +43,6 @@ jobs:
             const issueNumber = context.payload.issue.number;
             let labels = (context.payload.issue.labels || []).map(label => label.name.toLowerCase());
             if (labels.length === 0) {
-              // Double-check via the API in case the labels were not included in the event payload.
               const { data } = await withRetry(() => github.rest.issues.listLabelsOnIssue({
                 ...context.repo,
                 issue_number: issueNumber
@@ -56,18 +50,23 @@ jobs:
               labels = data.map(label => label.name.toLowerCase());
             }
 
-            let replied = false;
-            for (const [label, body] of Object.entries(replies)) {
-              if (!labels.includes(label)) continue;
+            const bodies = Object.entries(replies)
+              .filter(([label]) => labels.includes(label))
+              .map(([, body]) => body);
+            if (labels.length === 0) bodies.push("Hello, world!");
+            if (bodies.length === 0) return;
+
+            // Do not duplicate a reply when a workflow run is retried.
+            const comments = await withRetry(() => github.paginate(github.rest.issues.listComments, {
+              ...context.repo,
+              issue_number: issueNumber,
+              per_page: 100
+            }));
+            for (const body of bodies) {
+              if (comments.some(comment => comment.user?.type === "Bot" && comment.body === body)) continue;
               await withRetry(() => github.rest.issues.createComment({
                 ...context.repo,
                 issue_number: issueNumber,
                 body
               }));
-              replied = true;
-              core.info(`Commented on issue #${issueNumber} for the "${label}" label.`);
-            }
-
-            if (!replied) {
-              core.info(`Issue #${issueNumber} has no bug, feature or discussion label, so no comment was added.`);
             }
