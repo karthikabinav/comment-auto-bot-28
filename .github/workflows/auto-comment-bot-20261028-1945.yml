@@ -3,34 +3,81 @@ name: Automated Comment Bot
 on:
   issues:
     types: [opened]
+  workflow_dispatch:
+    inputs:
+      create_test_issues:
+        description: Create the four requested integration-test issues
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   issues: write
 
+concurrency:
+  group: comment-auto-bot-28-${{ github.event.issue.number || github.run_id }}
+  cancel-in-progress: false
+
 jobs:
   auto-comment:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - name: Add comment based on issue label
+      - name: Comment on new issues or run the integration tests
         uses: actions/github-script@v7
+        env:
+          CREATE_TEST_ISSUES: ${{ inputs.create_test_issues }}
         with:
           script: |
-            const labels = context.payload.issue.labels.map(label => label.name);
-            let body = null;
-            if (labels.includes("bug")) {
-              body = "Thank you. We will fix it. Best regards, Karthik Abinav Sankararaman.";
-            } else if (labels.includes("feature")) {
-              body = "Thank you, we will consider to include this feature. Best regards, Karthik Abinav Sankararaman.";
-            } else if (labels.includes("discussion")) {
-              body = "Happy to discuss this topic with you. Best regards, Karthik Abinav Sankararaman.";
-            } else if (labels.length === 0) {
-              body = "Hello, world!";
-            }
-            if (body) {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.payload.issue.number,
-                body: body
+            const ownerName = 'Karthik Abinav Sankararaman';
+            const repository = { owner: context.repo.owner, repo: context.repo.repo };
+            const messages = {
+              bug: `Thank you. We will fix it. Best regards, ${ownerName}.`,
+              feature: `Thank you, we will consider to include this feature. Best regards, ${ownerName}.`,
+              discussion: `Happy to discuss this topic with you. Best regards, ${ownerName}.`
+            };
+
+            async function commentOnIssue(issue) {
+              const labels = issue.labels.map(label => typeof label === 'string' ? label : label.name);
+              const kind = ['bug', 'feature', 'discussion'].find(label => labels.includes(label));
+              const body = kind ? messages[kind] : (labels.length === 0 ? 'Hello, world!' : null);
+              if (!body) return;
+
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                ...repository, issue_number: issue.number, per_page: 100
               });
+              if (comments.some(comment => comment.body === body)) {
+                core.info(`Issue #${issue.number} already has the expected comment.`);
+                return;
+              }
+              await github.rest.issues.createComment({
+                ...repository, issue_number: issue.number, body
+              });
+              core.info(`Commented on issue #${issue.number}: ${body}`);
+            }
+
+            if (context.eventName === 'issues' && context.payload.action === 'opened') {
+              await commentOnIssue(context.payload.issue);
+            } else if (process.env.CREATE_TEST_ISSUES === 'true') {
+              // GITHUB_TOKEN-created issues do not trigger other workflows. This
+              // tests the same handler without activating duplicate legacy bots.
+              const tests = [
+                { title: 'Bug report', labels: ['bug'] },
+                { title: 'Feature request', labels: ['feature'] },
+                { title: 'Documentation update', labels: [] },
+                { title: 'General Discussion', labels: ['discussion'] }
+              ];
+              for (const test of tests) {
+                const { data: issue } = await github.rest.issues.create({
+                  ...repository,
+                  ...test,
+                  body: 'Integration test for the automated comment bot.'
+                });
+                const actualLabels = issue.labels.map(label => typeof label === 'string' ? label : label.name);
+                if (actualLabels.length !== test.labels.length || test.labels.some(label => !actualLabels.includes(label))) {
+                  throw new Error(`Incorrect labels on test issue #${issue.number}`);
+                }
+                await commentOnIssue(issue);
+                core.info(`Created test issue: ${issue.html_url}`);
+              }
             }
