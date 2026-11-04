@@ -1,0 +1,52 @@
+name: Automated Comment Bot
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+concurrency:
+  group: comment-auto-bot-28-${{ github.event.issue.number || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  auto-comment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Comment on new issue based on label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const ownerName = 'Karthik Abinav Sankararaman';
+            const labels = context.payload.issue.labels.map(label => label.name);
+            const messages = {
+              bug: `Thank you. We will fix it. Best regards, ${ownerName}.`,
+              feature: `Thank you, we will consider to include this feature. Best regards, ${ownerName}.`,
+              discussion: `Happy to discuss this topic with you. Best regards, ${ownerName}.`
+            };
+            const kind = ['bug', 'feature', 'discussion'].find(label => labels.includes(label));
+            if (!kind) {
+              core.info('No matching label (bug/feature/discussion); no comment added.');
+              return;
+            }
+            const body = messages[kind];
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              per_page: 100
+            });
+            if (comments.some(comment => comment.body === body)) {
+              core.info(`Issue #${context.payload.issue.number} already has the expected comment.`);
+              return;
+            }
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              body
+            });
+            core.info(`Commented on issue #${context.payload.issue.number}: ${body}`);
